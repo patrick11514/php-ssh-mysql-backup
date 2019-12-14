@@ -9,7 +9,7 @@ Poté pokračujete podle instrukcí.
 Chyby
 -------
 Pokud dostanete chybu `Segmentation fault` nebo podobnou, musíte povolit ve vašem systému podporu UTF-8 (LINUX).
-### Návod
+### Návod na povolení podpory UTF-8
 1. `apt install locales`
 2. Pokud nám vyběhne okno, najdeme v něm pomocí šipky DOLŮ `cs_CZ.UTF-8 UTF-8`
 3. Pokud se nám žádné okno neobjeví, zadáme `sudo dpkg-reconfigure locales` a postupujeme podle kroku 2
