@@ -14,5 +14,5 @@ Pokud dostanete chybu `Segmentation fault` nebo podobnou, musíte povolit ve va�
 2. Pokud nám vyběhne okno, najdeme v něm pomocí šipky DOLŮ `cs_CZ.UTF-8 UTF-8`
 3. Pokud se nám žádné okno neobjeví, zadáme `sudo dpkg-reconfigure locales` a postupujeme podle kroku 2
 4. Po vybrání `cs_CZ.UTF-8 UTF-8` vybereme `cs_CZ.UTF-8` a vyčkáme na konfiguraci
-5. V připadě používání PUTTY ji vypneme a opět zapneme, v případě linux systému se odhlásíme a opět přihlásíme
+5. V připadě používání PuTTY, nebo jiného SSH klienta ho vypneme a opět zapneme, v případě linux systému se odhlásíme a opět přihlásíme
 6. Mělo by vše fungovat
