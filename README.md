@@ -1,4 +1,4 @@
-Záloha databáze pouze pomocí SSH
+Záloha databáze pouze pomocí SSH a PHP
 ==============
 
 Instalace
