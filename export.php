@@ -27,7 +27,7 @@ if (file_exists("dbconn.txt")) {
         msg("Zadejte je znova!");
         goto start;
     }
-    $dt = explode(";", $ex[1]);
+    $dt = explode(";", base64_decode($ex[1]));
     if (empty($dt[0]) || empty($dt[1])) {
         unlink("dbconn.txt");
         msg("Údaje jsou neplatné!");
@@ -49,7 +49,7 @@ if (file_exists("dbconn.txt")) {
         case "ano":
         case "a":
             $file = fopen("dbconn.txt", "w");
-            fwrite($file, "%SAVED-DATA%|$username;$password|%/SAVED-DATA%");
+            fwrite($file, "%SAVED-DATA%|" . base64_encode($username . ";" . $password) . "|%/SAVED-DATA%");
             fclose($file);
         break;
 
