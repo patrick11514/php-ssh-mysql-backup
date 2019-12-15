@@ -1,7 +1,7 @@
 <?php
 
 if (empty($_SERVER["argv"])) {
-    msg("This script can be run only in shell console.");
+    msg("Tento skript nemůže běžet v prohlížeči!");
     exit;
 }
 
@@ -10,8 +10,12 @@ $ignore_dbs = [
     "mysql",
     "performance_schema"
 ];
+
 system("clear");
+
 start:
+
+
 if (file_exists("dbconn.txt")) {
     $content = file_get_contents("dbconn.txt");
     if (empty($content)) {
@@ -74,18 +78,25 @@ if (isset($conn->connect_error)) {
     }
     exit;
 }
+
+
 $rv = $conn->query("SHOW DATABASES;");
+
 while($db = mysqli_fetch_row($rv)) {
     if (in_array($db[0], $ignore_dbs)) continue;
     $dbs[] = $db[0];
 }
+
 $i = 1;
 
 $database_list = $dbs;
+
 foreach ($dbs as $database) {
     if ($database === "mysql" || $database === "information_schema" || $database === "performance_schema") continue; 
     msg("(" . $i++ . ") $database");
 }
+
+
 msg("");
 msg("Zadej čislo od 1 do" . ($i - 1));
 msg("Lze zadat pouze čislo, nebo 1,2,3.. nebo zadej all pro všechny databáze.");
@@ -152,6 +163,7 @@ if ($dbnum === "all") {
     fclose($file);
     msg("Dokončeno za " . (microtime(true) - $start) . "ms!");
     exit;
+    
 } else {
     if (isset($databases[1])) {
         $start = microtime(true);
