@@ -98,7 +98,7 @@ foreach ($dbs as $database) {
 
 
 msg("");
-msg("Zadej čislo od 1 do" . ($i - 1));
+msg("Zadej čislo od 1 do " . ($i - 1));
 msg("Lze zadat pouze čislo, nebo 1,2,3.. nebo zadej all pro všechny databáze.");
 
 while(true) {
@@ -163,7 +163,7 @@ if ($dbnum === "all") {
     fclose($file);
     msg("Dokončeno za " . (microtime(true) - $start) . "ms!");
     exit;
-    
+
 } else {
     if (isset($databases[1])) {
         $start = microtime(true);
