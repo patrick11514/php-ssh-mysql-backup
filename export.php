@@ -5,13 +5,47 @@ if (empty($_SERVER["argv"])) {
     exit;
 }
 
+system("clear");
+
+if (version_compare(PHP_VERSION, "7.0", "<=")) {
+    msg("Please ask your host to update PHP to 7.0 or higher.");
+    exit;
+}
+
+$extensions = [
+    "mysqli"
+];
+
+$errors = [];
+
+foreach ($extensions as $extension) {
+    if (!extension_loaded($extension)) {
+        $errors[] = $extension;
+    }
+}
+
+if (!empty($errors)) {
+    msg("Please ask your host to install this extensions:");
+    foreach ($errors as $error) {
+        msg("- $error");
+    }
+    exit;
+}
+
+$version = "0.1.1";
+$github_ver = file_get_contents("https://raw.githubusercontent.com/patrick11514/ssh-mysql-backup/master/latest");
+
+if (version_compare($version, $github_ver, "<")) {
+    msg("Máš zastaralou verzi, updatuj ji zde: https://github.com/patrick11514/ssh-mysql-backup/releases");
+}
+
 $ignore_dbs = [
     "information_schema",
     "mysql",
     "performance_schema"
 ];
 
-system("clear");
+
 
 start:
 
@@ -134,9 +168,12 @@ while(true) {
     }
 }
 
+$backups_f = [];
+
 if ($dbnum === "all") {
     $start = microtime(true);
     $return = shell_exec("mysqldump --all_databases -u $username --password=$password");
+    msg("Exportovano za " . (microtime(true) - $start) . "ms!");
     $filename = "database_export_all.sql";
     if (file_exists("database_export_all.sql")) {
         $ch = readline("Soubor database_export_all.sql již existuje, chcete ho přepsat? (Y/N): ");
@@ -153,7 +190,7 @@ if ($dbnum === "all") {
             case "no": 
             case "ne": 
             case "n": 
-                $filename = "database_export_all(" . randomstring(5) . ").sql";
+                $filename = "database_export_all (" . randomstring(5) . ").sql";
             break;
         }
     }
@@ -161,23 +198,23 @@ if ($dbnum === "all") {
     $file = fopen($filename, "w");
     fwrite($file, $return);
     fclose($file);
-    msg("Dokončeno za " . (microtime(true) - $start) . "ms!");
+    msg("Záloha uložena do " . __DIR__ . "/$filename");
     exit;
 
 } else {
     if (isset($databases[1])) {
-        $start = microtime(true);
         foreach ($databases as $database) {
             createSQL($database);
         }
-        msg("Dokončeno za " . (microtime(true) - $start) . "ms!");
-        exit;
     } else {
-        $start = microtime(true);
         createSQL($dbnum);
-        msg("Dokončeno za " . (microtime(true) - $start) . "ms!");
-        exit;
     }
+    msg("Záloha(y) uložena(y) do:");
+    foreach ($backups_f as $backup_file) {
+        msg("- " . __DIR__ . "/$backup_file");
+    }
+
+    exit;
 }
 
 
@@ -200,11 +237,14 @@ function msg($text) {
 }
 
 function createSQL($database) {
+    $start = microtime(true);
     global $username;
     global $password;
     global $database_list;
+    global $backups_f;
     $database = $database_list[$database - 1];
     $return = shell_exec("mysqldump $database -u $username --password=$password");
+    msg("Databáze $database exportována za " . (microtime(true) - $start) . "ms!");
     $filename = "database_export_$database.sql";
     if (file_exists("database_export_$database.sql")) {
         $ch = readline("Soubor database_export_$database.sql již existuje, chcete ho přepsat? (Y/N): ");
@@ -221,10 +261,11 @@ function createSQL($database) {
             case "no": 
             case "ne": 
             case "n": 
-                $filename = "database_export_$database(" . randomstring(5) . ").sql";
+                $filename = "database_export_$database (" . randomstring(5) . ").sql";
             break;
         }
     }
+    $backups_f[] = $filename;
     $file = fopen($filename, "w");
     fwrite($file, $return);
     fclose($file);
