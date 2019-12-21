@@ -1,6 +1,13 @@
 Záloha databáze pouze pomocí SSH a PHP
 ==============
 
+Požadvaky
+------
+- Testováno na php `7.3` a `7.4`
+- Testováno na Debian GNU/Linux 9 (stretch)
+- Mysqli addon k php
+- Mysql/MariaDB s podporou commandu `mysqldump`
+
 Instalace
 ------
 Stáhnete soubor `export.php`, ten otevřete pomocí příkazu `php`. __!!NE V PROHLÍŽEČI!!__
