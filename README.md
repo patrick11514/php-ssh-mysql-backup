@@ -10,7 +10,7 @@ Požadvaky
 
 Instalace
 ------
-Stáhnete soubor `export.php`, ten otevřete pomocí příkazu `php`. __!!NE V PROHLÍŽEČI!!__
+Stáhnete soubor `export.php`, ten otevřete pomocí příkazu `php export.php`. __!!NE V PROHLÍŽEČI!!__
 Poté pokračujete podle instrukcí.
 
 Chyby
