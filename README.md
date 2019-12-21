@@ -8,7 +8,7 @@ Požadvaky
 - Mysqli addon k php
 - Mysql/MariaDB s podporou commandu `mysqldump`
 
-Instalace
+Použití
 ------
 Stáhnete soubor `export.php`, ten otevřete pomocí příkazu `php export.php`. __!!NE V PROHLÍŽEČI!!__
 Poté pokračujete podle instrukcí.
