@@ -13,6 +13,35 @@ Použití
 Stáhnete soubor `export.php`, ten otevřete pomocí příkazu `php export.php`. __!!NE V PROHLÍŽEČI!!__
 Poté pokračujete podle instrukcí.
 
+Příkazy
+------
+### Nápověda:
+- syntaxe: `php export.php help`
+
+### Export pomocí příkazu:
+- syntaxe: `php export.php export <použití configu> <databáze/host> <jméno> <heslo> <databáze>`
+- použití s údaji v commandu: `php export.php export false <host> <jméno> <heslo> <databáze>`
+- použití s uloženými údaji: `php export.php export true <databáze>`
+
+**Příklady**:
+- `php export.php export true xenforo`
+- `php export.php export true xenforo,phpmyadmin`
+- `php export.php export true all`
+-
+- `php export.php export false localhost root password123 xenforo`
+- `php export.php export false 89.203.17.45 root password123 xenforo,phpmyadmin`
+- `php export.php export false 127.0.0.1 root password123 all`
+
+### Smazání configu (uložených údajů):
+- syntaxe: `php export.php delconf`
+
+### Uložení údajů:
+- syntaxe: `php export.php saveconf <jméno> <heslo> <host>`
+
+**Příklady**:
+- `php export.php saveconf root password123 localhost`
+- `php export.php saveconf web password123 82.204.68.48`
+
 Chyby
 -------
 Pokud dostanete chybu `Segmentation fault` nebo podobnou, musíte povolit ve vašem systému podporu UTF-8 (LINUX).
