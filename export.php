@@ -179,11 +179,12 @@ if (!empty($errors)) {
     exit;
 }
 
-$version = "0.1.5";
+$version = "0.1.6";
 $github_ver = file_get_contents("https://raw.githubusercontent.com/patrick11514/ssh-mysql-backup/master/latest");
 
 if (version_compare($version, $github_ver, "<")) {
-    msg(color("white") . background("red") . "Máš zastaralou verzi, updatuj ji zde: https://github.com/patrick11514/ssh-mysql-backup/releases");
+    msg(color("red") . background("white") . "Máš zastaralou verzi, updatuj ji zde: https://github.com/patrick11514/ssh-mysql-backup/releases");
+    exit;
 }
 
 $ignore_dbs = [
