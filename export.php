@@ -1,5 +1,4 @@
 <?php
-
 if (PHP_SAPI != 'cli') {
     msg("Tento skript nemůže běžet v prohlížeči!");
     exit;
