@@ -178,7 +178,7 @@ if (!empty($errors)) {
     exit;
 }
 
-$version = "0.1.6";
+$version = "0.1.7";
 $github_ver = file_get_contents("https://raw.githubusercontent.com/patrick11514/ssh-mysql-backup/master/latest");
 
 if (version_compare($version, $github_ver, "<")) {
