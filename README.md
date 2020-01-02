@@ -49,8 +49,8 @@ Pokud dostanete chybu `Segmentation fault` nebo podobnou, musíte povolit ve va�
 1. `apt install locales`
 2. Otevřeme soubor `/etc/locale.gen` a najdeme řádek `# cs_CZ.UTF-8 UTF-8`
 3. Odebereme `# ` a soubor bude vypadat takto:
-![Jak bude vypadat soubor locale.gen](https://files.patrick115.eu/imgs/bOdbTQV1cp.png)
-4. Poté zadáme `sudo dpkg-reconfigure locales` a vybereme `cs_CZ.UTF-8 UTF-8`
-5. Po vybrání `cs_CZ.UTF-8 UTF-8` vybereme `cs_CZ.UTF-8` a vyčkáme na konfiguraci
-6. V připadě používání PuTTY, nebo jiného SSH klienta ho vypneme a opět zapneme, v případě linux systému se odhlásíme a opět přihlásíme
-7. Mělo by vše fungovat
+4. ![Jak bude vypadat soubor locale.gen](https://files.patrick115.eu/imgs/bOdbTQV1cp.png)
+5. Poté zadáme `sudo dpkg-reconfigure locales` a vybereme `cs_CZ.UTF-8 UTF-8`
+6. Po vybrání `cs_CZ.UTF-8 UTF-8` vybereme `cs_CZ.UTF-8` a vyčkáme na konfiguraci
+7. V připadě používání PuTTY, nebo jiného SSH klienta ho vypneme a opět zapneme, v případě linux systému se odhlásíme a opět přihlásíme
+8. Mělo by vše fungovat
