@@ -179,7 +179,7 @@ if (!empty($errors)) {
     exit;
 }
 
-$version = "0.1.6";
+$version = "0.1.8";
 $github_ver = file_get_contents("https://raw.githubusercontent.com/patrick11514/ssh-mysql-backup/master/latest");
 
 if (version_compare($version, $github_ver, "<")) {
@@ -207,6 +207,7 @@ if (file_exists("dbconn.txt")) {
     $password = $credentials["password"];
     $host     = $credentials["host"]    ;
 } else {
+    check_host:
     $host_check = readline("Chcete použit jiného hosta? (A/N): ");
     switch(strtolower($host_check)){
         case "y":
@@ -222,12 +223,17 @@ if (file_exists("dbconn.txt")) {
         case "n": 
             $host = "localhost";
         break;
+        default:
+            msg(color("red") . "Platné možnosti: y,yes,ano,a|n,no,ne");
+            goto check_host;
+        break;
     }
     system("clear");
     $username = readline('Zadej jméno uživatele: ');
     system("clear");
     $password = readline("Zadej heslo pro {$username}@{$host}: ");
     system("clear");
+    check_save:
     $save = readline("Chcete uložit tyto údaje? (Y/N): ");
 
     switch(strtolower($save)) {
@@ -242,6 +248,10 @@ if (file_exists("dbconn.txt")) {
         case "no": 
         case "ne": 
         case "n": 
+        break;
+        default:
+            msg(color("red") . "Platné možnosti: y,yes,ano,a|n,no,ne");
+            goto check_save;
         break;
     }
 }
@@ -323,6 +333,7 @@ if ($dbnum === "all") {
     msg("Exportovano za " . (microtime(true) - $start) . "ms!");
     $filename = "database_export_all.sql";
     if (file_exists($cfg["folder"] . "database_export_all.sql")) {
+        exist_export_all:
         $ch = readline("Soubor database_export_all.sql již existuje, chcete ho přepsat? (Y/N): ");
         switch(strtolower($ch)){
             case "y":
@@ -338,6 +349,10 @@ if ($dbnum === "all") {
             case "ne": 
             case "n": 
                 $filename = "database_export_all (" . randomstring(5) . ").sql";
+            break;
+            default:
+                msg(color("red") . "Platné možnosti: y,yes,ano,a|n,no,ne");
+                goto exist_export_all;
             break;
         }
     }
@@ -399,6 +414,7 @@ function createSQL($database) {
     msg("Databáze $database exportována za " . (microtime(true) - $start) . "ms!");
     $filename = "database_export_$database.sql";
     if (file_exists($cfg["folder"] . "database_export_$database.sql")) {
+        exist_single_db:
         $ch = readline("Soubor database_export_$database.sql již existuje, chcete ho přepsat? (Y/N): ");
         switch(strtolower($ch)) {
             case "y":
@@ -414,6 +430,10 @@ function createSQL($database) {
             case "ne": 
             case "n": 
                 $filename = "database_export_$database (" . randomstring(5) . ").sql";
+            break;
+            default:
+                msg(color("red") . "Platné možnosti: y,yes,ano,a|n,no,ne");
+                goto exist_single_db;
             break;
         }
     }
