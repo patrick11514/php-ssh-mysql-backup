@@ -6,7 +6,7 @@ Ukázka
 ![Ukázka](https://files.patrick115.eu/imgs/qbRfNcHuve.png)
 
 
-Požadvaky
+Požadavky
 ------
 - Testováno na php `7.3` a `7.4`
 - Testováno na Debian GNU/Linux 9 (stretch)
