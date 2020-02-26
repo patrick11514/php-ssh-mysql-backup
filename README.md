@@ -3,10 +3,10 @@ Záloha databáze pouze pomocí SSH a PHP
 
 Ukázka
 -----
-![Ukázka](https://files.patrick115.eu/imgs/qbRfNcHuve.png)
+![Ukázka](https://upload.patrikmin.tech/screenshot/qbRfNcHuve)
 
 
-Požadvaky
+Požadavky
 ------
 - Testováno na php `7.3` a `7.4`
 - Testováno na Debian GNU/Linux 9 (stretch)
@@ -20,7 +20,7 @@ Pokud dostanete chybu `Segmentation fault` nebo podobnou, musíte povolit ve va�
 1. `apt install locales`
 2. Otevřeme soubor `/etc/locale.gen` a najdeme řádek `# cs_CZ.UTF-8 UTF-8`
 3. Odebereme `# ` a soubor bude vypadat takto:
-4. ![Jak bude vypadat soubor locale.gen](https://files.patrick115.eu/imgs/bOdbTQV1cp.png)
+4. ![Jak bude vypadat soubor locale.gen](https://upload.patrikmin.tech/screenshot/bOdbTQV1cp)
 5. Poté zadáme `sudo dpkg-reconfigure locales` a vybereme `cs_CZ.UTF-8 UTF-8`
 6. Po vybrání `cs_CZ.UTF-8 UTF-8` vybereme `cs_CZ.UTF-8` a vyčkáme na konfiguraci
 7. V připadě používání PuTTY, nebo jiného SSH klienta ho vypneme a opět zapneme, v případě linux systému se odhlásíme a opět přihlásíme
