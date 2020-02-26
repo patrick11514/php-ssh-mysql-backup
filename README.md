@@ -30,8 +30,11 @@ Pokud dostanete chybu `Segmentation fault` nebo podobnou, musíte povolit ve va�
 
 Použití
 ------
-Stáhnete soubor `export.php`, ten otevřete pomocí příkazu `php export.php`. __!!NE V PROHLÍŽEČI!!__
-Poté pokračujete podle instrukcí.
+1. Stáhnete soubor zip.
+2. Ten rozbalíme a přesuneme si soubor `export.php`, kam chceme.
+3. Soubor `export.php` otevřeme pomocí příkazu `php export.php`.
+__!!NE V PROHLÍŽEČI!!__
+4. Poté pokračujete podle instrukcí.
 
 Příkazy
 ------
