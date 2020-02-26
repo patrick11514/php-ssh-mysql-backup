@@ -82,9 +82,9 @@ if (isset($_SERVER["argv"][1])) {
      * Export Configu
      */
     } else if (if_arg(1) == "export") {
-        $usage = PHP_EOL . "php export.php export useconfig <host> <user> <password> <database(s)>"
+        $usage = PHP_EOL . "php export.php export useconfig <host> <port> <user> <password> <database(s)>"
         . PHP_EOL .
-        "php export.php export false localhost root password123456 xenforo,authme"
+        "php export.php export false localhost 3306 root password123456 xenforo,authme"
         . PHP_EOL .
         "php export.php export true all";
         /**
@@ -106,23 +106,24 @@ if (isset($_SERVER["argv"][1])) {
             * Export
             */
             $credentials = get_credentials_from_file();
-            check_credentials($credentials["host"], 3306, $credentials["username"], $credentials["password"]);
+            check_credentials($credentials["host"], $credentials["port"], $credentials["username"], $credentials["password"]);
             export_by_name($_SERVER["argv"][3]);
         /**
         * Argument=false
         */
         } else if (if_arg(2) == "false"){
-            if (empty($_SERVER["argv"][3]) || empty($_SERVER["argv"][4]) || empty($_SERVER["argv"][5]) || empty($_SERVER["argv"][6])) {
+            if (empty($_SERVER["argv"][3]) || empty($_SERVER["argv"][4]) || empty($_SERVER["argv"][5]) || empty($_SERVER["argv"][6]) || empty($_SERVER["argv"][7])) {
                 msg(color("green") . "Použití: $usage");
                 exit;
             }
             $credentials = [
-                "username" => $_SERVER["argv"][4],
-                "password" => $_SERVER["argv"][5],
-                "host"     => $_SERVER["argv"][3]
+                "username" => $_SERVER["argv"][5],
+                "password" => $_SERVER["argv"][6],
+                "host"     => $_SERVER["argv"][3],
+                "port" => $_SERVER["argv"][4]
             ];
-            check_credentials($credentials["host"], 3306, $credentials["username"], $credentials["password"]);
-            export_by_name($_SERVER["argv"][6]);
+            check_credentials($credentials["host"], $credentials["port"], $credentials["username"], $credentials["password"]);
+            export_by_name($_SERVER["argv"][7]);
         } else {
             msg(color("green") . "Použití: $usage");
             exit;
@@ -133,13 +134,13 @@ if (isset($_SERVER["argv"][1])) {
             msg(correct($command, $maxcount) . " - " . $helps[$id]);
         }
     } else if (if_arg(1) == "saveconf") {
-        $usage = PHP_EOL . "php export.php saveconf <username> <password> <host>"; 
-        if (empty($_SERVER["argv"][2]) || empty($_SERVER["argv"][3]) || empty($_SERVER["argv"][4])) {
+        $usage = PHP_EOL . "php export.php saveconf <username> <password> <host> <port>"; 
+        if (empty($_SERVER["argv"][2]) || empty($_SERVER["argv"][3]) || empty($_SERVER["argv"][4] || $_SERVER["argv"][5])) {
             msg(color("red") . "Použití: " . $usage);
             exit;
         }
-        check_credentials($_SERVER["argv"][4], 3306, $_SERVER["argv"][2], $_SERVER["argv"][3], false);
-        save_credentials_to_file($_SERVER["argv"][2], $_SERVER["argv"][3], $_SERVER["argv"][4]);
+        check_credentials($_SERVER["argv"][4], $_SERVER["argv"][5], $_SERVER["argv"][2], $_SERVER["argv"][3], false);
+        save_credentials_to_file($_SERVER["argv"][2], $_SERVER["argv"][3], $_SERVER["argv"][4], $_SERVER["argv"][5]);
         msg("Config uložen!");
     } else {
         msg(color("red") . "Příkaz nenalezen!");
@@ -179,7 +180,7 @@ if (!empty($errors)) {
     exit;
 }
 
-$version = "0.1.8";
+$version = "0.1.9";
 $github_ver = file_get_contents("https://raw.githubusercontent.com/patrick11514/ssh-mysql-backup/master/latest");
 
 if (version_compare($version, $github_ver, "<")) {
@@ -206,9 +207,10 @@ if (file_exists("dbconn.txt")) {
     $username = $credentials["username"];
     $password = $credentials["password"];
     $host     = $credentials["host"]    ;
+    $port = $credentials["port"];
 } else {
     check_host:
-    $host_check = readline("Chcete použit jiného hosta? (A/N): ");
+    $host_check = readline("Chcete použit jiného hosta, než localhost? (A/N): ");
     switch(strtolower($host_check)){
         case "y":
         case "yes":
@@ -229,19 +231,43 @@ if (file_exists("dbconn.txt")) {
         break;
     }
     system("clear");
+    check_port:
+    $port_check = readline("Chcete použít jiný port, než 3306? (A/N): ");
+    switch(strtolower($port_check)){
+        case "y":
+        case "yes":
+        case "ano":
+        case "a":
+            $port = readline("Zadejte port: ");
+        break;
+
+        case "n": 
+        case "no": 
+        case "ne": 
+        case "n": 
+            $port = null;
+        break;
+        default:
+            msg(color("red") . "Platné možnosti: y,yes,ano,a|n,no,ne");
+            goto check_port;
+        break;
+    }
+    system("clear");
     $username = readline('Zadej jméno uživatele: ');
     system("clear");
-    $password = readline("Zadej heslo pro {$username}@{$host}: ");
+    $temp_port = isset($port) ? ":" . $port : null;
+    $host_str = $username . "@" . $host . $temp_port;
+    $password = readline("Zadej heslo pro {$host_str}: ");
     system("clear");
     check_save:
-    $save = readline("Chcete uložit tyto údaje? (Y/N): ");
+    $save = readline("Chcete uložit tyto údaje? (A/N): ");
 
     switch(strtolower($save)) {
         case "y":
         case "yes":
         case "ano":
         case "a":
-            save_credentials_to_file($username, $password, $host);
+            save_credentials_to_file($username, $password, $host, $port);
         break;
 
         case "n": 
@@ -257,14 +283,19 @@ if (file_exists("dbconn.txt")) {
 }
 
 msg("Vyber kterou databázi chceš exportovat:");
-$conn = new mysqli("localhost:3306", $username, $password);
+$port_str = isset($port) ? ":" . $port : null;
+$host_port = $host . $port_str;
+$conn = new mysqli($host_port, $username, $password);
 if (isset($conn->connect_error)) {
     system("clear");
-    msg("MYSQL Error: " . $conn->connect_error);
+    msg("");
+    msg(color("red") . "MYSQL Error: " . $conn->connect_error);
+    msg("");
     if (file_exists("dbconn.txt")) {
         unlink("dbconn.txt");
-        msg(color("white") . background("red") . "Konfigurační soubor nalezen =>");
-        msg(color("white") . background("red") . "Konfigurační soubor byl smazán!");
+        msg(color("red") . "Konfigurační soubor nalezen =>");
+        msg(color("red") . "Konfigurační soubor byl smazán!");
+        msg("");
         msg("Spusťte skript znova a zadejte platné údaje.");
     }
     exit;
@@ -328,13 +359,14 @@ $backups_f = [];
 
 if ($dbnum === "all") {
     $start = microtime(true);
-    $return = shell_exec("mysqldump --all_databases --user=$username --password=$password --host=$host");
-    $return = watermark($return, (microtime(true) - $start));
+    $nullport = isset($port) ? " --port=" . $port : null;
+    $return = shell_exec("mysqldump --all_databases --user=$username --password=$password --host=$host" . $nullport);
+    $return = watermark($return, (microtime(true) - $start), null);
     msg("Exportovano za " . (microtime(true) - $start) . "ms!");
     $filename = "database_export_all.sql";
     if (file_exists($cfg["folder"] . "database_export_all.sql")) {
         exist_export_all:
-        $ch = readline("Soubor database_export_all.sql již existuje, chcete ho přepsat? (Y/N): ");
+        $ch = readline("Soubor database_export_all.sql již existuje, chcete ho přepsat? (A/N): ");
         switch(strtolower($ch)){
             case "y":
             case "yes":
@@ -404,18 +436,20 @@ function createSQL($database) {
     global $username;
     global $password;
     global $host;
+    global $port;
     global $database_list;
     global $backups_f;
     global $cfg;
 
     $database = $database_list[$database - 1];
-    $return = shell_exec("mysqldump $database --user=$username --password=$password --host=$host");
-    $return = watermark($return, (microtime(true) - $start));
+    $nullport = isset($port) ? " --port=" . $port : null;
+    $return = shell_exec("mysqldump $database --user=$username --password=$password --host=$host" . $nullport);
+    $return = watermark($return, (microtime(true) - $start), $database);
     msg("Databáze $database exportována za " . (microtime(true) - $start) . "ms!");
     $filename = "database_export_$database.sql";
     if (file_exists($cfg["folder"] . "database_export_$database.sql")) {
         exist_single_db:
-        $ch = readline("Soubor database_export_$database.sql již existuje, chcete ho přepsat? (Y/N): ");
+        $ch = readline("Soubor database_export_$database.sql již existuje, chcete ho přepsat? (A/N): ");
         switch(strtolower($ch)) {
             case "y":
             case "yes":
@@ -453,7 +487,12 @@ function randomstring($length) {
     return $randomString;
 }
 
-function watermark($array, $time) {
+function watermark($array, $time, $dbname) {
+    if ($dbname === null) {
+        $db_str = "";
+    } else {
+        $db_str = "CREATE DATABASE IF NOT EXISTS `{$dbname}` CHARACTER SET `utf8mb`;USE `{$dbname}`;";
+    }
     $explode = explode("\n", $array);
     $return[0] = "--";
     $return[1] = "-- Exported at " . date("d.m.Y H:i:s");
@@ -462,8 +501,9 @@ function watermark($array, $time) {
     $return[4] = "-- by using https://github.com/patrick11514/ssh-mysql-backup";
     $return[5] = "-- ------------------------------------------------------";
     $return[6] = "--";
+    $return[7] = $db_str;
     foreach ($explode as $id => $value) {
-        $newid = $id + 7;
+        $newid = $id + 8;
         $return[$newid] = $value;
     }
     return implode("\n", $return);
@@ -502,20 +542,21 @@ function background($bg) {
 }
 
 function check_credentials($host, $port, $user, $password, $showhelp = true) {
-    $mysqli = @new mysqli("$host:$port", $user, $password);
+    $nullport = isset($port) && $port != 3306 ? ":" . $port : null;
+    $mysqli = @new mysqli($host . $nullport, $user, $password);
     if (isset($mysqli->connect_error)) {
         msg(color("red") . background("white") . "MYSQLI Error: " . $mysqli->connect_error);
         if ($showhelp === true ){
-            msg(color("green") . "Prosím spusťte `php export.php delconf` a poté `php export.php saveconf <username> <password> <host>` pro úpravu uložených údajů.");
+            msg(color("green") . "Prosím spusťte `php export.php delconf` a poté `php export.php saveconf <username> <password> <host> <port>` pro úpravu uložených údajů.");
         }
         exit;
     }
     return true;
 }
 
-function save_credentials_to_file($username, $password, $host) {
+function save_credentials_to_file($username, $password, $host, $port) {
     $file = fopen("dbconn.txt", "w");
-    fwrite($file, "%SAVED-DATA%|" . base64_encode($username . ";" . $password . ";" . $host) . "|%/SAVED-DATA%");
+    fwrite($file, "%SAVED-DATA%|" . base64_encode($username . ";" . $password . ";" . $host. ";".  $port) . "|%/SAVED-DATA%");
     fclose($file);
 }
 
@@ -535,17 +576,20 @@ function get_credentials_from_file() {
         return false;
     }
     $dt = explode(";", base64_decode($ex[1]));
-    if (empty($dt[0]) || empty($dt[1])) {
+    if (empty($dt[0]) || empty($dt[1]) || empty($dt[2]) || count($dt) < 4) {
         unlink("dbconn.txt");
         msg(color("white") . background("red") . "Údaje jsou neplatné!");
         msg(color("white") . background("red") . "Zadejte je znova!");
         return false;
     }
 
+    $port = isset($dt[3]) && $dt[3] !== "" ? $dt[3] : null;
+
     return [
         "username" => $dt[0],
         "password" => $dt[1],
-        "host"     => $dt[2] 
+        "host"     => $dt[2],
+        "port" => $port
     ];
 }
 
@@ -554,14 +598,15 @@ function export_by_name($string) {
     global $cfg;
     if ($string === "all") {
         $start = microtime(true);
-        $return = shell_exec("mysqldump --all_databases --user={$credentials["username"]} --password={$credentials["password"]} --host={$credentials["host"]}");
+        $nullport = isset($credentials["port"]) ? " --port=" . $credentials["port"] : null;
+        $return = shell_exec("mysqldump --all_databases --user={$credentials["username"]} --password={$credentials["password"]} --host={$credentials["host"]}" . $nullport);
         if (file_exists($cfg["folder"] . "database_export_all.sql")) {
             $filename = "database_export_all (" . randomstring(5) . ").sql";
         } else {
             $filename = "database_export_all.sql";
         }
         $file = fopen($cfg["folder"] . $filename, "w");
-        fwrite($file, watermark($return, (microtime(true) - $start)));
+        fwrite($file, watermark($return, (microtime(true) - $start), null));
         fclose($file);
     } else {
 
@@ -576,14 +621,15 @@ function export_by_name($string) {
         }
         foreach ($dbs as $db) {
             $start = microtime(true);
-            $return = shell_exec("mysqldump $db --user={$credentials["username"]} --password={$credentials["password"]} --host={$credentials["host"]}");
+            $nullport = isset($credentials["port"]) ? " --port=" . $credentials["port"] : null;
+            $return = shell_exec("mysqldump $db --user={$credentials["username"]} --password={$credentials["password"]} --host={$credentials["host"]}" . $nullport);
             if (file_exists($cfg["folder"] . "database_export_$db.sql")) {
                 $filename = "database_export_$db (" . randomstring(5) . ").sql";
             } else {
                 $filename = "database_export_$db.sql";
             }
             $file = fopen($cfg["folder"] . $filename, "w");
-            fwrite($file, watermark($return, (microtime(true) - $start)));
+            fwrite($file, watermark($return, (microtime(true) - $start), $db));
             fclose($file);
         }
     }
