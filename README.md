@@ -39,8 +39,8 @@ Příkazy
 - syntaxe: `php export.php help`
 
 ### Export pomocí příkazu:
-- syntaxe: `php export.php export <použití configu> <databáze/host> <jméno> <heslo> <databáze>`
-- použití s údaji v commandu: `php export.php export false <host> <jméno> <heslo> <databáze>`
+- syntaxe: `php export.php export <použití configu> <databáze/host> <port> <jméno> <heslo> <databáze>`
+- použití s údaji v commandu: `php export.php export false <host> <port> <jméno> <heslo> <databáze>`
 - použití s uloženými údaji: `php export.php export true <databáze>`
 
 **Příklady**:
@@ -49,17 +49,17 @@ Příkazy
 - `php export.php export true all`
 -
 - `php export.php export false localhost root password123 xenforo`
-- `php export.php export false 89.203.17.45 root password123 xenforo,phpmyadmin`
-- `php export.php export false 127.0.0.1 root password123 all`
+- `php export.php export false 89.203.17.45 3306 root password123 xenforo,phpmyadmin`
+- `php export.php export false 127.0.0.1 3458 root password123 all`
 
 ### Smazání configu (uložených údajů):
 - syntaxe: `php export.php delconf`
 
 ### Uložení údajů:
-- syntaxe: `php export.php saveconf <jméno> <heslo> <host>`
+- syntaxe: `php export.php saveconf <jméno> <heslo> <host> <port>`
 
 **Příklady**:
-- `php export.php saveconf root password123 localhost`
-- `php export.php saveconf web password123 82.204.68.48`
+- `php export.php saveconf root password123 localhost 3306`
+- `php export.php saveconf web password123 82.204.68.48 3345`
 
 
